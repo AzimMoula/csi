@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "678917337930",
+    "project_id": "csi-app-5d154",
+    "storage_bucket": "csi-app-5d154.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:678917337930:android:e67b69a03d7ce7cbdcc7b3",
+        "android_client_info": {
+          "package_name": "com.example.csi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_qocFalokw5Z0-LoTgrt_u7z9bQpih-0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:678917337930:android:5055aad1d676ebfbdcc7b3",
+        "android_client_info": {
+          "package_name": "com.example.csi_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_qocFalokw5Z0-LoTgrt_u7z9bQpih-0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
