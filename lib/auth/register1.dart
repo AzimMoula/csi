@@ -1,13 +1,9 @@
 // ignore_for_file: prefer_typing_uninitialized_variables, unused_local_variable, use_build_context_synchronously
 
-import 'package:csi/auth/sign_in.dart';
-import 'package:csi/global/widgets/text_field.dart';
-import 'package:csi/main.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:csi/auth/register2.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class Register1 extends StatefulWidget {
   const Register1({super.key});
@@ -23,6 +19,31 @@ class _Register1State extends State<Register1> {
   final TextEditingController email = TextEditingController();
   final TextEditingController password = TextEditingController();
   String? theme;
+  bool isValidEmail(String email) {
+    final RegExp emailRegex = RegExp(
+      r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$',
+    );
+
+    final List<String> allowedDomains = [
+      'gmail.com',
+      'outlook.com',
+      'yahoo.com',
+      'hotmail.com',
+    ];
+
+    if (!emailRegex.hasMatch(email)) {
+      return false;
+    }
+
+    String domain = email.split('@').last.toLowerCase();
+
+    if (!allowedDomains.contains(domain)) {
+      return false;
+    }
+
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
     var branches = [
@@ -83,7 +104,7 @@ class _Register1State extends State<Register1> {
                       color: const Color.fromRGBO(17, 12, 49, 1),
                       style: const ButtonStyle(
                           backgroundColor:
-                              MaterialStatePropertyAll(Colors.white)),
+                              WidgetStatePropertyAll(Colors.white)),
                       onPressed: () {
                         Navigator.pop(context);
                       },
@@ -128,14 +149,23 @@ class _Register1State extends State<Register1> {
                                     height: 50,
                                     width: double.maxFinite,
                                     child: TextField(
-                                      style: TextStyle(
-                                          color: Theme.of(context)
-                                              .primaryColorDark),
+                                      style:
+                                          const TextStyle(color: Colors.black),
                                       controller: name,
                                       obscureText: false,
                                       keyboardType: TextInputType.name,
+                                      onTap: () {
+                                        if (email.text.isNotEmpty &&
+                                            !isValidEmail(email.text)) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(const SnackBar(
+                                                  content: Text(
+                                                      'Please use your Personal Email')));
+                                          email.clear();
+                                        }
+                                      },
                                       decoration: InputDecoration(
-                                          // hintText: 'Email',
+                                          // hintText: 'Name',
                                           errorBorder: OutlineInputBorder(
                                             borderSide: BorderSide.none,
                                             borderRadius:
@@ -168,12 +198,20 @@ class _Register1State extends State<Register1> {
                                     height: 50,
                                     width: double.maxFinite,
                                     child: TextFormField(
-                                      style: TextStyle(
-                                          color: Theme.of(context)
-                                              .primaryColorDark),
+                                      style:
+                                          const TextStyle(color: Colors.black),
                                       controller: email,
                                       obscureText: false,
                                       keyboardType: TextInputType.emailAddress,
+                                      onFieldSubmitted: (value) {
+                                        if (!isValidEmail(value)) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(const SnackBar(
+                                                  content: Text(
+                                                      'Please use your Personal Email')));
+                                          email.clear();
+                                        }
+                                      },
                                       decoration: InputDecoration(
                                         // hintText: 'Email',
                                         border: OutlineInputBorder(
@@ -204,13 +242,22 @@ class _Register1State extends State<Register1> {
                                     height: 50,
                                     width: double.maxFinite,
                                     child: TextField(
-                                      style: TextStyle(
-                                          color: Theme.of(context)
-                                              .primaryColorDark),
+                                      style:
+                                          const TextStyle(color: Colors.black),
                                       controller: password,
                                       obscureText: obscured,
                                       keyboardType:
                                           TextInputType.visiblePassword,
+                                      onTap: () {
+                                        if (email.text.isNotEmpty &&
+                                            !isValidEmail(email.text)) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(const SnackBar(
+                                                  content: Text(
+                                                      'Please use your Personal Email')));
+                                          email.clear();
+                                        }
+                                      },
                                       decoration: InputDecoration(
                                           suffixIcon: IconButton(
                                             highlightColor: Colors.transparent,
@@ -274,30 +321,30 @@ class _Register1State extends State<Register1> {
                             ),
                             ElevatedButton(
                               onPressed: () async {
-                                if (name.text == '' ||
-                                    email.text == '' ||
-                                    password.text == '') {
+                                if (email.text.isNotEmpty &&
+                                    !isValidEmail(email.text)) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content: Text(
+                                              'Please use your Personal Email')));
+                                  email.clear();
+                                }
+                                if (name.text.isEmpty ||
+                                    email.text.isEmpty ||
+                                    password.text.isEmpty) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                           content: Text('Fill all fields')));
                                 } else {
                                   try {
-                                    await auth.createUserWithEmailAndPassword(
-                                        email: email.text,
-                                        password: password.text);
-                                    final docRef = db
-                                        .collection('Users')
-                                        .doc(auth.currentUser?.uid);
-                                    docRef.set({
-                                      'Name': name.text,
-                                      'Email': email.text,
-                                    });
-                                    FirebaseAuth.instance.currentUser
-                                        ?.updateDisplayName(name.text);
-                                    if (auth.currentUser != null) {
-                                      Navigator.pushNamed(
-                                          context, '/register2');
-                                    }
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => Register2(
+                                              name: name.text,
+                                              email: email.text,
+                                              password: password.text)),
+                                    );
                                   } catch (e) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                         SnackBar(content: Text(e.toString())));
@@ -305,13 +352,13 @@ class _Register1State extends State<Register1> {
                                 }
                               },
                               style: const ButtonStyle(
-                                  shape: MaterialStatePropertyAll(
+                                  shape: WidgetStatePropertyAll(
                                       RoundedRectangleBorder(
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(15)))),
-                                  minimumSize: MaterialStatePropertyAll(
+                                  minimumSize: WidgetStatePropertyAll(
                                       Size(double.maxFinite, 50)),
-                                  backgroundColor: MaterialStatePropertyAll(
+                                  backgroundColor: WidgetStatePropertyAll(
                                       Color.fromRGBO(17, 12, 49, 1))),
                               child: Text(
                                 'Continue',
@@ -327,10 +374,11 @@ class _Register1State extends State<Register1> {
                                 const Text('Already have an account?'),
                                 TextButton(
                                     style: const ButtonStyle(
-                                        overlayColor: MaterialStatePropertyAll(
+                                        overlayColor: WidgetStatePropertyAll(
                                             Colors.transparent)),
                                     onPressed: () {
                                       Navigator.pop(context);
+                                      Navigator.pushNamed(context, '/sign-in');
                                     },
                                     child: const Text(
                                       'Sign In',

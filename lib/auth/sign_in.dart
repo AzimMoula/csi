@@ -1,8 +1,5 @@
 // ignore_for_file: unused_local_variable, prefer_const_declarations, non_constant_identifier_names, use_build_context_synchronously
 
-import 'package:csi/auth/register1.dart';
-import 'package:csi/global/widgets/text_field.dart';
-import 'package:csi/main.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -67,7 +64,7 @@ class _SignInState extends State<SignIn> {
                       color: const Color.fromRGBO(17, 12, 49, 1),
                       style: const ButtonStyle(
                           backgroundColor:
-                              MaterialStatePropertyAll(Colors.white)),
+                              WidgetStatePropertyAll(Colors.white)),
                       onPressed: () {
                         Navigator.pushReplacementNamed(context, '/intro');
                       },
@@ -116,10 +113,9 @@ class _SignInState extends State<SignIn> {
                                             Radius.circular(15))),
                                     height: 50,
                                     width: double.maxFinite,
-                                    child: TextField(
-                                      style: TextStyle(
-                                          color: Theme.of(context)
-                                              .primaryColorDark),
+                                    child: TextFormField(
+                                      style:
+                                          const TextStyle(color: Colors.black),
                                       controller: email,
                                       obscureText: false,
                                       keyboardType: TextInputType.emailAddress,
@@ -135,8 +131,7 @@ class _SignInState extends State<SignIn> {
                               ),
                             ),
                             Padding(
-                              padding:
-                                  const EdgeInsets.fromLTRB(15.0, 15, 15, 0),
+                              padding: const EdgeInsets.fromLTRB(15, 15, 15, 0),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -152,9 +147,8 @@ class _SignInState extends State<SignIn> {
                                     height: 50,
                                     width: double.maxFinite,
                                     child: TextField(
-                                      style: TextStyle(
-                                          color: Theme.of(context)
-                                              .primaryColorDark),
+                                      style:
+                                          const TextStyle(color: Colors.black),
                                       controller: password,
                                       obscureText: obscured,
                                       keyboardType:
@@ -200,7 +194,7 @@ class _SignInState extends State<SignIn> {
                                           checkColor: Theme.of(context)
                                               .primaryColorLight,
                                           overlayColor:
-                                              const MaterialStatePropertyAll(
+                                              const WidgetStatePropertyAll(
                                                   Colors.transparent),
                                           activeColor: const Color.fromRGBO(
                                               17, 12, 49, 1),
@@ -219,9 +213,8 @@ class _SignInState extends State<SignIn> {
                                   ),
                                   TextButton(
                                       style: const ButtonStyle(
-                                          overlayColor:
-                                              MaterialStatePropertyAll(
-                                                  Colors.transparent)),
+                                          overlayColor: WidgetStatePropertyAll(
+                                              Colors.transparent)),
                                       onPressed: () async {
                                         try {
                                           await auth
@@ -261,6 +254,8 @@ class _SignInState extends State<SignIn> {
                                         email: email.text,
                                         password: password.text);
                                     Navigator.of(context)
+                                        .popUntil((route) => route.isFirst);
+                                    Navigator.of(context)
                                         .pushReplacementNamed('/admin-home');
                                     showDialog(
                                         context: context,
@@ -283,6 +278,8 @@ class _SignInState extends State<SignIn> {
                                     await auth.signInWithEmailAndPassword(
                                         email: email.text,
                                         password: password.text);
+                                    Navigator.of(context)
+                                        .popUntil((route) => route.isFirst);
                                     Navigator.of(context)
                                         .pushReplacementNamed('/user-home');
                                     showDialog(
@@ -320,9 +317,6 @@ class _SignInState extends State<SignIn> {
                                               ),
                                             ));
                                   } on FirebaseAuthException catch (e) {
-                                    // setState(() {
-                                    //   attempts++;
-                                    // });
                                     ScaffoldMessenger.of(context).showSnackBar(
                                         SnackBar(
                                             content:
@@ -337,19 +331,19 @@ class _SignInState extends State<SignIn> {
                                   }
                                   await FirebaseMessaging.instance
                                       .subscribeToTopic('events');
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content: Text('Signed In')));
+                                  // ScaffoldMessenger.of(context).showSnackBar(
+                                  //     const SnackBar(
+                                  //         content: Text('Signed In')));
                                 }
                               },
                               style: const ButtonStyle(
-                                  shape: MaterialStatePropertyAll(
+                                  shape: WidgetStatePropertyAll(
                                       RoundedRectangleBorder(
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(15)))),
-                                  minimumSize: MaterialStatePropertyAll(
+                                  minimumSize: WidgetStatePropertyAll(
                                       Size(double.maxFinite, 50)),
-                                  backgroundColor: MaterialStatePropertyAll(
+                                  backgroundColor: WidgetStatePropertyAll(
                                       Color.fromRGBO(17, 12, 49, 1))),
                               child: Text(
                                 'Sign In',
@@ -365,14 +359,12 @@ class _SignInState extends State<SignIn> {
                                 const Text('I\'m a new user'),
                                 TextButton(
                                     style: const ButtonStyle(
-                                        overlayColor: MaterialStatePropertyAll(
+                                        overlayColor: WidgetStatePropertyAll(
                                             Colors.transparent)),
                                     onPressed: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const Register1()));
+                                      Navigator.pop(context);
+                                      Navigator.pushNamed(
+                                          context, '/register1');
                                     },
                                     child: const Text(
                                       'Register',

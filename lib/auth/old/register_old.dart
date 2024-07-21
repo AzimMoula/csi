@@ -1,13 +1,12 @@
 // ignore_for_file: prefer_typing_uninitialized_variables, unused_local_variable, use_build_context_synchronously
 
-import 'package:csi/auth/sign_in.dart';
 import 'package:csi/global/widgets/text_field.dart';
-import 'package:csi/main.dart';
+import 'package:csi/services/provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 
 class RegisterOld extends StatefulWidget {
   const RegisterOld({super.key});
@@ -62,22 +61,7 @@ class _RegisterOldState extends State<RegisterOld> {
         actions: [
           IconButton(
             onPressed: () async {
-              SharedPreferences preferences =
-                  await SharedPreferences.getInstance();
-              if (preferences.getString('theme') == null) {
-                preferences.setString('theme', 'light');
-              } else {
-                preferences.setString(
-                    'theme',
-                    preferences.getString('theme') == 'light'
-                        ? 'dark'
-                        : 'light');
-                setState(() {
-                  theme = preferences.getString('theme');
-                });
-                MyApp.themeNotifier.value =
-                    theme == 'light' ? ThemeMode.dark : ThemeMode.light;
-              }
+              Provider.of<CSIProvider>(context, listen: false).toggleTheme();
             },
             icon: Icon(theme == 'dark' ? Icons.dark_mode : Icons.light_mode),
           ),
@@ -247,8 +231,8 @@ class _RegisterOldState extends State<RegisterOld> {
                     }
                   },
                   style: const ButtonStyle(
-                      minimumSize: MaterialStatePropertyAll(Size(180, 60)),
-                      backgroundColor: MaterialStatePropertyAll(Colors.blue)),
+                      minimumSize: WidgetStatePropertyAll(Size(180, 60)),
+                      backgroundColor: WidgetStatePropertyAll(Colors.blue)),
                   child: Text(
                     'Submit',
                     style: TextStyle(color: Colors.grey.shade200),

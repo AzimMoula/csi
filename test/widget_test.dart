@@ -1,9 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 
 
@@ -25,7 +21,6 @@ class ContactHR extends StatelessWidget {
             children: [
               GestureDetector(
                 onLongPress: () {
-                  
                   _copyToClipboard("+91 9550342356", context);
                 },
                 child: const Card(

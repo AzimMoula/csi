@@ -1,9 +1,5 @@
 // ignore_for_file: unused_local_variable, prefer_const_declarations, non_constant_identifier_names, use_build_context_synchronously
 
-import 'package:csi/auth/register1.dart';
-import 'package:csi/global/widgets/text_field.dart';
-import 'package:csi/main.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -62,7 +58,6 @@ class _IntroState extends State<Intro> {
                 child: Container(
                   height: 450.5,
                   decoration: BoxDecoration(
-                      // color: Theme.of(context).scaffoldBackgroundColor,
                       color: Theme.of(context).scaffoldBackgroundColor,
                       borderRadius: const BorderRadius.only(
                           bottomLeft: Radius.circular(50))),
@@ -114,17 +109,17 @@ class _IntroState extends State<Intro> {
                               ),
                             ),
                             const SizedBox(
-                              height: 10,
+                              height: 30,
                             ),
-                            const Center(
-                              child: Text(
-                                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Venenatis tellus in metus vulputate eu scelerisque.',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w300,
-                                    fontSize: 12.5),
-                              ),
-                            ),
+                            // const Center(
+                            //   child: Text(
+                            //     'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Venenatis tellus in metus vulputate eu scelerisque.',
+                            //     style: TextStyle(
+                            //         color: Colors.white,
+                            //         fontWeight: FontWeight.w300,
+                            //         fontSize: 12.5),
+                            //   ),
+                            // ),
                             const SizedBox(
                               height: 30,
                             ),
@@ -132,14 +127,14 @@ class _IntroState extends State<Intro> {
                               onPressed: () =>
                                   Navigator.pushNamed(context, '/sign-in'),
                               style: const ButtonStyle(
-                                  shape: MaterialStatePropertyAll(
+                                  shape: WidgetStatePropertyAll(
                                       RoundedRectangleBorder(
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(15)))),
-                                  minimumSize: MaterialStatePropertyAll(
+                                  minimumSize: WidgetStatePropertyAll(
                                       Size(double.maxFinite, 50)),
                                   backgroundColor:
-                                      MaterialStatePropertyAll(Colors.white)),
+                                      WidgetStatePropertyAll(Colors.white)),
                               child: const Text(
                                 'Sign In',
                                 style: TextStyle(
@@ -153,15 +148,15 @@ class _IntroState extends State<Intro> {
                               onPressed: () =>
                                   Navigator.pushNamed(context, '/register1'),
                               style: const ButtonStyle(
-                                  shape: MaterialStatePropertyAll(
+                                  shape: WidgetStatePropertyAll(
                                       RoundedRectangleBorder(
                                           side: BorderSide(
                                               width: 2.5, color: Colors.white),
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(15)))),
-                                  minimumSize: MaterialStatePropertyAll(
+                                  minimumSize: WidgetStatePropertyAll(
                                       Size(double.maxFinite, 50)),
-                                  backgroundColor: MaterialStatePropertyAll(
+                                  backgroundColor: WidgetStatePropertyAll(
                                       Color.fromRGBO(17, 12, 49, 1))),
                               child: Text(
                                 'Register',

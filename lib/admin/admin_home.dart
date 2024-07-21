@@ -1,12 +1,17 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:csi/admin/screens/registrations.dart';
+import 'package:csi/admin/screens/customize_event.dart';
+import 'package:csi/admin/screens/events.dart';
+import 'package:csi/admin/screens/memberships.dart';
 import 'package:csi/admin/screens/scan_qr.dart';
-import 'package:csi/main.dart';
+import 'package:csi/services/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:material_floating_search_bar_2/material_floating_search_bar_2.dart';
 
 class AdminHomeScreen extends StatefulWidget {
   final int index;
@@ -22,11 +27,25 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   String? theme;
   List<String> events = [];
   List<String> queryevents = [];
+  String? randomGreeting;
+  List<String> greetings = [
+    "Hello",
+    "Bonjour",
+    "Hola",
+    "Ciao",
+  ];
   @override
   void initState() {
     index = widget.index;
     loadEvents();
+    randomGreeting = getRandomGreeting(greetings);
     super.initState();
+  }
+
+  String getRandomGreeting(List<String> strings) {
+    final random = Random();
+    int index = random.nextInt(strings.length);
+    return strings[index];
   }
 
   Future<void> loadEvents() async {
@@ -42,253 +61,231 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   @override
   Widget build(BuildContext context) {
     List<Widget> adminWidgetList = [
-      const Text('Home'),
-      const ScanQR(),
-      Stack(
+      const Center(child: Text('Home')),
+      Center(
+          child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 50.0),
-            child: StreamBuilder(
-                stream:
-                    FirebaseFirestore.instance.collection('Events').snapshots(),
-                builder: ((context, snapshot) {
-                  if (snapshot.hasData) {
-                    return ListView.builder(
-                        itemCount: snapshot.data!.docs.length,
-                        itemBuilder: ((context, index) {
-                          final DocumentSnapshot docSnap =
-                              snapshot.data!.docs[index];
-                          return Padding(
-                            padding: const EdgeInsets.all(5.0),
-                            child: GestureDetector(
-                              onTap: () => Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => Registrations(
-                                            name: docSnap['Name'],
-                                          ))),
-                              child: Card(
-                                shadowColor: Colors.blue.shade700,
-                                elevation: 8,
-                                child: SizedBox(
-                                  height: 200,
-                                  width: 100,
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    children: [
-                                      GestureDetector(
-                                        onLongPress: () {
-                                          showModalBottomSheet(
-                                              isScrollControlled: true,
-                                              showDragHandle: true,
-                                              context: context,
-                                              builder: ((context) =>
-                                                  FractionallySizedBox(
-                                                    heightFactor: 0.8,
-                                                    child:
-                                                        SingleChildScrollView(
-                                                      child: Column(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          InteractiveViewer(
-                                                            maxScale: 5,
-                                                            child:
-                                                                Image.network(
-                                                              docSnap['url'],
-                                                              fit: BoxFit
-                                                                  .fitWidth,
-                                                              loadingBuilder:
-                                                                  (BuildContext
-                                                                          context,
-                                                                      Widget
-                                                                          child,
-                                                                      ImageChunkEvent?
-                                                                          loadingProgress) {
-                                                                if (loadingProgress ==
-                                                                    null) {
-                                                                  return child;
-                                                                }
-                                                                return Align(
-                                                                  alignment:
-                                                                      Alignment
-                                                                          .center,
-                                                                  child:
-                                                                      CircularProgressIndicator(
-                                                                    value: loadingProgress.expectedTotalBytes !=
-                                                                            null
-                                                                        ? loadingProgress.cumulativeBytesLoaded /
-                                                                            loadingProgress.expectedTotalBytes!
-                                                                        : null,
-                                                                  ),
-                                                                );
-                                                              },
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  )));
-                                        },
-                                        child: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(21.5),
-                                          child: Image.network(
-                                            docSnap['url'],
-                                            fit: BoxFit.fitWidth,
-                                            loadingBuilder:
-                                                (BuildContext context,
-                                                    Widget child,
-                                                    ImageChunkEvent?
-                                                        loadingProgress) {
-                                              if (loadingProgress == null) {
-                                                return child;
-                                              }
-                                              return Center(
-                                                child:
-                                                    CircularProgressIndicator(
-                                                  value: loadingProgress
-                                                              .expectedTotalBytes !=
-                                                          null
-                                                      ? loadingProgress
-                                                              .cumulativeBytesLoaded /
-                                                          loadingProgress
-                                                              .expectedTotalBytes!
-                                                      : null,
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                      ),
-                                      Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        mainAxisSize: MainAxisSize.max,
-                                        children: [
-                                          Text(docSnap['Name'],
-                                              style: const TextStyle(
-                                                  decoration:
-                                                      TextDecoration.underline,
-                                                  fontSize: 20,
-                                                  fontWeight: FontWeight.bold)),
-                                          Text(docSnap['Date'],
-                                              style: const TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w600)),
-                                          Text(docSnap['Time'],
-                                              style: const TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w600)),
-                                          Text(docSnap['location'],
-                                              style: const TextStyle(
-                                                  fontSize: 17,
-                                                  fontWeight: FontWeight.w600)),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          );
-                        }));
-                  } else {
-                    const Icon(Icons.watch_later_outlined);
-                    const Text("No Events");
-                  }
-                  return const Center(child: CircularProgressIndicator());
-                })),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const ScanQR(),
+                ),
+              );
+            },
+            child: const Padding(
+              padding: EdgeInsets.symmetric(vertical: 100, horizontal: 40),
+              child: Text("Open Scanner"),
+            ),
           ),
-          buildFloatingSearchBar(),
         ],
-      ),
-      const Text('Memberships'),
+      )),
+      const Events(),
+      const Memberships(),
+      const CustomizeEvent(),
     ];
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(
-          actions: [
-            IconButton(
-              onPressed: () async {
-                SharedPreferences preferences =
-                    await SharedPreferences.getInstance();
-                if (preferences.getString('theme') == null) {
-                  preferences.setString('theme', 'light');
-                } else {
-                  preferences.setString(
-                      'theme',
-                      preferences.getString('theme') == 'light'
-                          ? 'dark'
-                          : 'light');
-                  setState(() {
-                    theme = preferences.getString('theme');
-                  });
-                  MyApp.themeNotifier.value =
-                      theme == 'light' ? ThemeMode.dark : ThemeMode.light;
-                }
-              },
-              icon: Icon(theme == 'dark' ? Icons.dark_mode : Icons.light_mode),
-            ),
-            IconButton(
-                onPressed: () {
-                  showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                            title: const Padding(
-                              padding: EdgeInsets.all(12.0),
-                              child: FittedBox(
-                                  child: Text('Do you want to Logout?')),
-                            ),
-                            actions: [
+        body: SizedBox(
+            width: double.maxFinite,
+            height: MediaQuery.of(context).size.height,
+            child: Stack(children: [
+              Padding(
+                padding: EdgeInsets.only(top: index == 0 ? 158 : 100),
+                child: Container(
+                  color: const Color.fromRGBO(17, 12, 49, 1),
+                  child: Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height,
+                    decoration: BoxDecoration(
+                        color: Theme.of(context).scaffoldBackgroundColor,
+                        borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(50))),
+                    child: adminWidgetList[index],
+                  ),
+                ),
+              ),
+              Container(
+                decoration: BoxDecoration(
+                    gradient: LinearGradient(colors: [
+                  const Color.fromRGBO(17, 12, 49, 1),
+                  Theme.of(context).scaffoldBackgroundColor,
+                  Theme.of(context).scaffoldBackgroundColor,
+                ])),
+                child: Container(
+                    height: index == 0 ? 158.5 : 100.5,
+                    decoration: const BoxDecoration(
+                        color: Color.fromRGBO(17, 12, 49, 1),
+                        borderRadius: BorderRadius.only(
+                            bottomRight: Radius.circular(50))),
+                    child: Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              DrawerButton(
+                                style: const ButtonStyle(
+                                    iconColor: WidgetStatePropertyAll(
+                                        Colors.transparent)),
+                                onPressed: () {},
+                              ),
+                              Image.asset(
+                                  fit: BoxFit.scaleDown,
+                                  height: 50,
+                                  width: 50,
+                                  'assets/CSI-MJCET white.png'),
                               Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
+                                mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  ElevatedButton(
+                                  IconButton(
+                                    tooltip: 'Change Theme',
+                                    color: Colors.white,
+                                    onPressed: () async {
+                                      Provider.of<CSIProvider>(context,
+                                              listen: false)
+                                          .toggleTheme();
+                                      // SharedPreferences preferences =
+                                      //     await SharedPreferences.getInstance();
+                                      // if (preferences.getString('theme') ==
+                                      //     null) {
+                                      //   preferences.setString('theme', 'light');
+                                      // } else {
+                                      //   final String? temp =
+                                      //       preferences.getString('theme');
+                                      //   preferences.setString('theme',
+                                      //       temp == 'light' ? 'dark' : 'light');
+                                      //   setState(() {
+                                      //     theme =
+                                      //         preferences.getString('theme');
+                                      //   });
+                                      //   MyApp.CSIProvider.value =
+                                      //       theme == 'light'
+                                      //           ? ThemeMode.dark
+                                      //           : ThemeMode.light;
+                                      // }
+                                    },
+                                    icon: Icon(Theme.of(context).brightness ==
+                                            Brightness.light
+                                        ? Icons.dark_mode
+                                        : Icons.light_mode),
+                                  ),
+                                  IconButton(
+                                      color: Colors.white,
+                                      tooltip: 'Logout',
                                       onPressed: () async {
-                                        final SharedPreferences preferences =
-                                            await SharedPreferences
-                                                .getInstance();
-                                        await FirebaseAuth.instance.signOut();
-                                        // ignore: use_build_context_synchronously
-                                        Navigator.of(context)
-                                            .pushReplacementNamed('/sign-in');
-                                        preferences.remove('email');
-                                        preferences.remove('password');
+                                        showDialog(
+                                            context: context,
+                                            builder: (context) => AlertDialog(
+                                                  title: const Padding(
+                                                    padding:
+                                                        EdgeInsets.all(12.0),
+                                                    child: FittedBox(
+                                                        child: Text(
+                                                            'Do you want to Logout?')),
+                                                  ),
+                                                  actions: [
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceEvenly,
+                                                      children: [
+                                                        ElevatedButton(
+                                                            onPressed:
+                                                                () async {
+                                                              final SharedPreferences
+                                                                  preferences =
+                                                                  await SharedPreferences
+                                                                      .getInstance();
+                                                              await FirebaseAuth
+                                                                  .instance
+                                                                  .signOut();
+                                                              if (!context
+                                                                  .mounted) {
+                                                                return;
+                                                              }
+                                                              Navigator.pop(
+                                                                  context);
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pushReplacementNamed(
+                                                                      '/sign-in');
+                                                              preferences
+                                                                  .remove(
+                                                                      'email');
+                                                              preferences.remove(
+                                                                  'password');
+                                                            },
+                                                            child: const Text(
+                                                                'Yes')),
+                                                        ElevatedButton(
+                                                            onPressed: () {
+                                                              Navigator.pop(
+                                                                  context);
+                                                            },
+                                                            child: const Text(
+                                                                'No')),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ));
                                       },
-                                      child: const Text('Yes')),
-                                  ElevatedButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                      child: const Text('No')),
+                                      icon: const Icon(Icons.logout))
                                 ],
                               ),
                             ],
-                          ));
-                  // final SharedPreferences preferences =
-                  //     await SharedPreferences.getInstance();
-                  // await FirebaseAuth.instance.signOut();
-                  // Navigator.of(context).pushNamed('/sign-in');
-                  // preferences.remove('email');
-                  // preferences.remove('password');
-                },
-                icon: const Icon(Icons.logout)),
-          ],
-          automaticallyImplyLeading: false,
-          title: const Text('Admin View'),
-          centerTitle: true,
-        ),
-        body: Center(child: adminWidgetList[index]),
+                          ),
+                          if (index == 0)
+                            Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('$randomGreeting',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleSmall!
+                                          .copyWith(
+                                              fontSize: 16, color: Colors.white)
+                                      // const TextStyle(
+                                      //     color: Colors.white,
+                                      //     fontWeight: FontWeight.w500,
+                                      //     fontSize: 17),
+                                      ),
+                                  Text('Admin',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium!
+                                          .copyWith(
+                                              letterSpacing: 2,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 20,
+                                              color: Colors.white)
+                                      // const TextStyle(
+                                      //     color: Colors.white,
+                                      //     fontWeight: FontWeight.bold,
+                                      //     fontSize: 20),
+                                      ),
+                                ],
+                              ),
+                            ),
+                        ],
+                      ),
+                    )),
+              ),
+            ])),
         bottomNavigationBar: BottomNavigationBar(
             elevation: 10,
-            backgroundColor: Colors.blue,
+            // backgroundColor: Colors.blue,
             currentIndex: index,
             // showSelectedLabels: false,
             showUnselectedLabels: true,
+            selectedLabelStyle: GoogleFonts.poppins(),
+            unselectedLabelStyle: GoogleFonts.plusJakartaSans(),
             selectedItemColor: Theme.of(context).brightness == Brightness.light
                 ? Colors.black
                 : Colors.grey,
@@ -303,10 +300,12 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
               BottomNavigationBarItem(
                   icon: Icon(Icons.qr_code_2), label: 'Scan'),
               BottomNavigationBarItem(
-                  icon: Icon(Icons.table_chart), label: 'Registration'),
+                  icon: Icon(Icons.table_chart), label: 'Events'),
               BottomNavigationBarItem(
                   icon: Icon(Icons.card_membership_rounded),
                   label: 'Membership'),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.event_repeat), label: 'Customize Event'),
             ]),
         floatingActionButton: FloatingActionButton(
             child: const Icon(CupertinoIcons.calendar_badge_plus),
@@ -314,77 +313,6 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
               Navigator.of(context).pushNamed('/create-event');
             }),
       ),
-    );
-  }
-
-  Widget buildFloatingSearchBar() {
-    final isPortrait =
-        MediaQuery.of(context).orientation == Orientation.portrait;
-
-    return FloatingSearchBar(
-      hint: 'Search...',
-      scrollPadding: const EdgeInsets.only(top: 16, bottom: 56),
-      transitionDuration: const Duration(milliseconds: 800),
-      transitionCurve: Curves.easeInOut,
-      physics: const BouncingScrollPhysics(),
-      axisAlignment: isPortrait ? 0.0 : -1.0,
-      openAxisAlignment: 0.0,
-      width: isPortrait ? 600 : 500,
-      debounceDelay: const Duration(milliseconds: 500),
-      clearQueryOnClose: true,
-      onFocusChanged: (isFocused) {
-        queryevents = events;
-      },
-      onSubmitted: (query) {
-        List<String> matchQuery = [];
-        for (var name in events) {
-          if (name.toLowerCase().contains(query.toLowerCase())) {
-            matchQuery.add(name);
-          }
-        }
-        setState(() {
-          queryevents = matchQuery;
-        });
-      },
-      transition: CircularFloatingSearchBarTransition(),
-      actions: [
-        FloatingSearchBarAction(
-          showIfOpened: false,
-          child: CircularButton(
-            icon: const Icon(Icons.search_rounded),
-            onPressed: () {},
-          ),
-        ),
-        FloatingSearchBarAction.searchToClear(
-          showIfClosed: false,
-        ),
-      ],
-      builder: (context, transition) {
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: Material(
-            color: Theme.of(context).cardColor.withOpacity(0.75),
-            elevation: 4.0,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: queryevents.map((doc) {
-                return Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: ListTile(
-                    onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => Registrations(
-                                  name: doc,
-                                ))),
-                    title: Center(child: Text(doc)),
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-        );
-      },
     );
   }
 }
